@@ -1,9 +1,7 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { cookies } from 'next/headers';
-import { ThemeProvider } from '@/providers/theme-provider';
-import { AuthProvider } from '@/providers/supabase-provider';
-import { IntlProvider } from '@/providers/intl-provider';
+import IntlProvider from '@/providers/intl-provider';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import './globals.css';
 
@@ -19,7 +17,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: 'Naitei AI - Japanese Interview Practice Platform',
-  description: 'Practice Japanese interviews with AI HR. Improve your speaking, keigo, and confidence.',
+  description:
+    'Practice Japanese interviews with AI HR. Improve your speaking, keigo, and confidence.',
 };
 
 export default async function RootLayout({
@@ -37,20 +36,11 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-background font-sans">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <IntlProvider locale={locale}>
-            <AuthProvider>
-              <TooltipProvider>
-                {children}
-              </TooltipProvider>
-            </AuthProvider>
-          </IntlProvider>
-        </ThemeProvider>
+        <IntlProvider>
+          <TooltipProvider>
+            {children}
+          </TooltipProvider>
+        </IntlProvider>
       </body>
     </html>
   );

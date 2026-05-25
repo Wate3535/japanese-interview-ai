@@ -1,10 +1,5 @@
-import type { NextConfig } from 'next';
-import createNextIntlPlugin from 'next-intl/plugin';
+import type { NextConfig } from "next";
 
-const withNextIntl = createNextIntlPlugin('./messages/i18n.request.config.ts');
+const nextConfig: NextConfig = {};
 
-const nextConfig: NextConfig = {
-  allowedDevOrigins: ['*.bolt.new'],
-};
-
-export default withNextIntl(nextConfig);
+export default nextConfig;

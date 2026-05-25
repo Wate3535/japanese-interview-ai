@@ -1,23 +1,17 @@
-import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
-import { notFound } from 'next/navigation';
-import { locales, type Locale } from '@/messages/i18n.config';
+'use client';
 
-export async function IntlProvider({
-  locale,
-  children,
-}: {
-  locale: string;
+import {NextIntlClientProvider} from 'next-intl';
+
+type Props = {
   children: React.ReactNode;
-}) {
-  if (!locales.includes(locale as Locale)) {
-    notFound();
-  }
+};
 
-  const messages = await getMessages();
-
+export default function IntlProvider({children}: Props) {
   return (
-    <NextIntlClientProvider messages={messages}>
+    <NextIntlClientProvider
+      locale="en"
+      messages={{}}
+    >
       {children}
     </NextIntlClientProvider>
   );
