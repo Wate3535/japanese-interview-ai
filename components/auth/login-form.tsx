@@ -4,10 +4,9 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
-import { createClient } from '@/lib/supabase/client';
+import { signInWithPopup } from 'firebase/auth';
+import { auth, googleProvider } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
@@ -16,49 +15,23 @@ export function LoginForm() {
   const t = useTranslations();
   const router = useRouter();
   const { toast } = useToast();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+
   const [loading, setLoading] = useState(false);
-  const supabase = createClient();
-
-  const handleEmailLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) throw error;
-
-      toast({ title: t('auth.loginSuccess') });
-      router.push('/dashboard');
-      router.refresh();
-    } catch (error) {
-      toast({
-        title: t('auth.invalidCredentials'),
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleGoogleLogin = async () => {
     setLoading(true);
+
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        },
+      await signInWithPopup(auth, googleProvider);
+
+      toast({
+        title: 'Login successful',
       });
-      if (error) throw error;
+
+      router.push('/dashboard');
     } catch (error) {
       toast({
-        title: t('common.error'),
+        title: 'Google login failed',
         variant: 'destructive',
       });
     } finally {
@@ -73,55 +46,20 @@ export function LoginForm() {
       className="w-full max-w-md space-y-6"
     >
       <div className="text-center">
-        <h1 className="text-2xl font-bold">{t('auth.loginTitle')}</h1>
+        <h1 className="text-2xl font-bold">
+          {t('auth.loginTitle')}
+        </h1>
+
         <p className="text-sm text-muted-foreground mt-2">
           {t('auth.loginSubtitle')}
         </p>
       </div>
 
-      <form onSubmit={handleEmailLogin} className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="email">{t('auth.email')}</Label>
-          <Input
-            id="email"
-            type="email"
-            placeholder="name@example.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            disabled={loading}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="password">{t('auth.password')}</Label>
-            <Link
-              href="/forgot-password"
-              className="text-sm text-primary hover:underline"
-            >
-              {t('auth.forgotPassword')}
-            </Link>
-          </div>
-          <Input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            disabled={loading}
-          />
-        </div>
-
-        <Button type="submit" className="w-full" disabled={loading}>
-          {loading ? t('common.loading') : t('nav.login')}
-        </Button>
-      </form>
-
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
           <Separator className="w-full" />
         </div>
+
         <div className="relative flex justify-center text-xs uppercase">
           <span className="bg-background px-2 text-muted-foreground">
             {t('auth.orContinueWith')}
@@ -154,12 +92,16 @@ export function LoginForm() {
             fill="#EA4335"
           />
         </svg>
-        Google
+
+        {loading ? 'Loading...' : 'Continue with Google'}
       </Button>
 
       <p className="text-center text-sm text-muted-foreground">
         {t('auth.noAccount')}{' '}
-        <Link href="/signup" className="text-primary hover:underline">
+        <Link
+          href="/signup"
+          className="text-primary hover:underline"
+        >
           {t('nav.signup')}
         </Link>
       </p>

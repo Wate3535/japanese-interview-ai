@@ -165,7 +165,11 @@
     "timeElapsed": "O'tgan vaqt",
     "messagesExchanged": "Almashilgan xabarlar",
     "aiInterviewer": "AI intervyur",
-    "you": "Siz"
+    "you": "Siz",
+    "new_grad": "Yangi bitiruvchi",
+    "it_company": "IT kompaniya",
+    "part_time": "Part time",
+    "intl_student": "Xalqaro talaba"
   },
   "feedback": {
     "title": "Intervyu fikr-mulohazasi",

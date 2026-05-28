@@ -1,8 +1,13 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { cookies } from 'next/headers';
+
 import IntlProvider from '@/providers/intl-provider';
+import { ThemeProvider } from '@/providers/theme-provider';
+import { FirebaseAuthProvider } from '@/providers/firebase-auth-provider';
+
 import { TooltipProvider } from '@/components/ui/tooltip';
+
 import './globals.css';
 
 const geistSans = Geist({
@@ -36,11 +41,19 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-background font-sans">
-        <IntlProvider>
-          <TooltipProvider>
-            {children}
-          </TooltipProvider>
-        </IntlProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+        >
+          <IntlProvider>
+            <FirebaseAuthProvider>
+              <TooltipProvider>
+                {children}
+              </TooltipProvider>
+            </FirebaseAuthProvider>
+          </IntlProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
