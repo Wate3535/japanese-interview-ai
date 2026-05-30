@@ -89,8 +89,7 @@ export function SiteHeader({
               }}
               className="flex items-center"
             >
-              <span className="text-2xl font-bold bg-gradient-to-r from-navy-600 to-blue-600 bg-clip-text text-transparent">
-                {t('common.appName')}
+<span className="text-2xl font-bold text-blue-600">                {t('common.appName')}
               </span>
             </motion.div>
           </Link>
@@ -179,12 +178,18 @@ export function SiteHeader({
           {/* USER */}
           {user ? (
             <DropdownMenu>
-              <DropdownMenuTrigger>
-                <Button
-                  variant="ghost"
-                  className="relative h-9 w-9 rounded-full"
-                >
-                  <Avatar className="h-9 w-9">
+              <DropdownMenuTrigger
+               className="
+               relative
+               h-9
+               w-9
+               rounded-full
+               inline-flex
+               items-center
+               justify-center
+               "
+>
+  <Avatar className="h-9 w-9">
                     <AvatarImage
                       src={
                         user.photoURL || ''
@@ -198,7 +203,7 @@ export function SiteHeader({
                       {user.email?.[0]?.toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
-                </Button>
+               
               </DropdownMenuTrigger>
 
               <DropdownMenuContent

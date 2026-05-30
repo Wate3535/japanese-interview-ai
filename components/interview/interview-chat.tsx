@@ -35,23 +35,19 @@ import {
   LogOut,
 } from 'lucide-react';
 
-import {
-  collection,
-  addDoc,
-  serverTimestamp,
-} from 'firebase/firestore';
-
-import {
-  db,
-  auth,
-} from '@/lib/firebase';
+import { InterviewService } from '@/lib/services/interview.service';
 
 interface InterviewChatProps {
   interviewType: string;
 
   mode: 'chat' | 'video';
 
-  onEnd: () => void;
+  sessionId: string;
+
+  onEnd: (
+  duration: number,
+  messageCount: number
+) => void;
 
   onBack: () => void;
 }
@@ -59,6 +55,7 @@ interface InterviewChatProps {
 export function InterviewChat({
   interviewType,
   mode,
+  sessionId,
   onEnd,
   onBack,
 }: InterviewChatProps) {
@@ -120,6 +117,12 @@ const handleSend = async (
     },
   ]);
 
+  await InterviewService.saveMessage(
+  sessionId,
+  'user',
+  content
+);
+
   setIsTyping(true);
 
   try {
@@ -144,28 +147,6 @@ const handleSend = async (
     const data =
       await response.json();
 
-    // SAVE FIREBASE
-    await addDoc(
-      collection(
-        db,
-        'interviews'
-      ),
-      {
-        uid:
-          auth.currentUser?.uid,
-
-        answer: content,
-
-        feedback:
-          data.result,
-
-        interviewType,
-
-        createdAt:
-          serverTimestamp(),
-      }
-    );
-
     // ADD CHAT MESSAGE
     setMessages((prev) => [
       ...prev,
@@ -180,6 +161,12 @@ const handleSend = async (
           new Date(),
       },
     ]);
+
+    await InterviewService.saveMessage(
+  sessionId,
+  'assistant',
+  data.result
+);
 
     // D-ID VIDEO MODE
     if (
@@ -561,9 +548,18 @@ useEffect(() => {
           </div>
 
           <Button
-            variant="destructive"
-            onClick={onEnd}
-          >
+  variant="destructive"
+  onClick={() =>
+    onEnd(
+      elapsed,
+      messages.filter(
+        (m) =>
+          m.role ===
+          'user'
+      ).length
+    )
+  }
+>
             <LogOut className="mr-2 h-4 w-4" />
 
             {t(

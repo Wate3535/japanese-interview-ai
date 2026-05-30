@@ -1,6 +1,8 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -67,7 +69,72 @@ function getScoreLevel(score: number) {
 
 export default function FeedbackPage() {
   const t = useTranslations('feedback');
-  const scoreLevel = getScoreLevel(mockFeedback.overallScore);
+
+  const searchParams = useSearchParams();
+
+const sessionId =
+  searchParams.get(
+    'sessionId'
+  );
+  
+  const [feedback, setFeedback] = useState(mockFeedback); 
+  const [loading, setLoading] = useState(true);
+
+  const scoreLevel = getScoreLevel( feedback.overallScore );
+
+ 
+useEffect(() => {
+  const loadFeedback =
+    async () => {
+     
+        console.log(
+        'SESSION ID:',
+        sessionId
+      );
+
+
+      try {
+        const response =
+          await fetch(
+            '/api/feedback',
+            {
+              method: 'POST',
+
+              headers: {
+                'Content-Type':
+                  'application/json',
+              },
+
+              body: JSON.stringify({
+                messages: [
+                  {
+                    role: 'user',
+                    content:
+                      '自己紹介をします。',
+                  },
+                ],
+              }),
+            }
+          );
+
+        const data =
+          await response.json();
+
+        setFeedback((prev) => ({
+  ...prev,
+  ...data,
+}));
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+  loadFeedback();
+}, []);
+
+
 
   return (
     <div className="max-w-6xl mx-auto space-y-8">
@@ -109,14 +176,21 @@ export default function FeedbackPage() {
                     strokeLinecap="round"
                     strokeDasharray={352}
                     initial={{ strokeDashoffset: 352 }}
-                    animate={{ strokeDashoffset: 352 - (352 * mockFeedback.overallScore) / 100 }}
-                    transition={{ duration: 1, ease: 'easeOut' }}
+animate={{
+  strokeDashoffset:
+    352 -
+    (352 *
+      feedback.overallScore) /
+      100,
+}}                    transition={{ duration: 1, ease: 'easeOut' }}
                     className="text-blue-600"
                   />
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-center">
-                    <div className="text-3xl font-bold">{mockFeedback.overallScore}</div>
+                    <div className="text-3xl font-bold">
+  {feedback.overallScore}
+</div>
                     <div className="text-sm text-muted-foreground">/ 100</div>
                   </div>
                 </div>
@@ -137,11 +211,11 @@ export default function FeedbackPage() {
       </motion.div>
 
       {/* Score Radar Chart */}
-      <ScoreRadarChart scores={mockFeedback.scores} />
+      <ScoreRadarChart scores={feedback.scores} />
 
       {/* Detailed Scores */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {Object.entries(mockFeedback.scores).map(([key, value], index) => (
+        {Object.entries(feedback.scores).map(([key, value], index) => (
           <motion.div
             key={key}
             initial={{ opacity: 0, y: 20 }}
@@ -151,7 +225,13 @@ export default function FeedbackPage() {
             <Card>
               <CardContent className="p-4">
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm font-medium">{t(key as any)}</span>
+                  <span className="text-sm font-medium">
+  {t(
+    key === 'hr_impression'
+      ? 'hrImpression'
+      : (key as never)
+  )}
+</span>
                   <span className="text-sm font-bold">{value}%</span>
                 </div>
                 <Progress value={value} className="h-2" />
@@ -163,13 +243,15 @@ export default function FeedbackPage() {
 
       {/* Improvement Suggestions */}
       <ImprovementSuggestions
-        strengths={mockFeedback.strengths}
-        improvements={mockFeedback.improvements}
-        weakPoints={mockFeedback.weakPoints}
-      />
+  strengths={feedback.strengths}
+  improvements={feedback.improvements}
+  weakPoints={feedback.weakPoints}
+/>
 
       {/* Corrected Answers */}
-      <CorrectedAnswers corrections={mockFeedback.corrections} />
+      <CorrectedAnswers
+  corrections={feedback.corrections}
+/>
     </div>
   );
 }

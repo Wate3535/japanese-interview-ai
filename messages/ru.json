@@ -181,6 +181,8 @@
     "naturalnessDesc": "Насколько естественно звучит ваш японский",
     "hrImpression": "Впечатление HR",
     "hrImpressionDesc": "Общее впечатление на интервьюера",
+    "hr_impression": "Впечатление HR",
+    "hr_impressionDesc": "Общее впечатление на интервьюера",
     "correctedAnswers": "Исправленные ответы",
     "improvements": "Рекомендации по улучшению",
     "whatYouDidWell": "Что вы сделали хорошо",

@@ -181,6 +181,8 @@
     "naturalnessDesc": "How natural your Japanese sounds",
     "hrImpression": "HR Impression",
     "hrImpressionDesc": "Overall impression on the interviewer",
+    "hr_impression": "HR Impression",
+    "hr_impressionDesc": "Overall impression on the interviewer",
     "correctedAnswers": "Corrected Answers",
     "improvements": "Improvement Suggestions",
     "whatYouDidWell": "What You Did Well",

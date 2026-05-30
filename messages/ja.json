@@ -181,6 +181,8 @@
     "naturalnessDesc": "日本語の自然さ",
     "hrImpression": "HR印象",
     "hrImpressionDesc": "面接官への全体的印象",
+    "hr_impression": "HR印象",
+    "hr_impressionDesc": "面接官への全体的印象",
     "correctedAnswers": "修正回答",
     "improvements": "改善提案",
     "whatYouDidWell": "良かった点",

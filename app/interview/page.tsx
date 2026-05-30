@@ -11,6 +11,10 @@ import { InterviewChat } from '@/components/interview/interview-chat';
 
 import { InterviewComplete } from '@/components/interview/interview-complete';
 
+import { InterviewService } from '@/lib/services/interview.service';
+
+
+
 type InterviewState =
   | 'select'
   | 'mode'
@@ -41,6 +45,8 @@ export default function InterviewPage() {
   const [messageCount, setMessageCount] =
     useState(0);
 
+    const [sessionId, setSessionId] = useState<string>('');
+
   // INTERVIEW TYPE
   const handleTypeSelect = (
     type: string
@@ -51,28 +57,70 @@ export default function InterviewPage() {
   };
 
   // MODE SELECT
-  const handleModeSelect = (
-    selectedMode: InterviewMode
-  ) => {
-    setMode(selectedMode);
+
+const handleModeSelect = async (
+  selectedMode: InterviewMode
+) => {
+  try {
+    const newSessionId =
+      await InterviewService.createSession({
+        interviewType,
+        mode: selectedMode,
+      });
+
+    setSessionId(
+      newSessionId
+    );
+
+    setMode(
+      selectedMode
+    );
 
     setState('chat');
-  };
+  } catch (error) {
+    console.error(
+      'Create Session Error:',
+      error
+    );
+  }
+};
+
+
 
   // END INTERVIEW
-  const handleEndInterview = () => {
-    setDuration(180);
+ const handleEndInterview = async (
+  duration: number,
+  messageCount: number
+) => {
+  try {
+    await InterviewService.completeSession(
+      sessionId,
+      duration
+    );
 
-    setMessageCount(12);
+    setDuration(
+      duration
+    );
 
-    setState('complete');
-  };
+    setMessageCount(
+      messageCount
+    );
 
-  // FEEDBACK
-  const handleViewFeedback = () => {
-    window.location.href =
-      '/feedback';
-  };
+    setState(
+      'complete'
+    );
+  } catch (error) {
+    console.error(
+      'Complete Session Error:',
+      error
+    );
+  }
+};
+// FEEDBACK
+const handleViewFeedback = () => {
+  window.location.href =
+    `/feedback?sessionId=${sessionId}`;
+};
 
   // RESET
   const handleTryAnother = () => {
@@ -168,16 +216,13 @@ export default function InterviewPage() {
 
       {/* STEP 3 */}
       {state === 'chat' && (
-        <InterviewChat
-          interviewType={
-            interviewType
-          }
-          mode={mode}
-          onEnd={
-            handleEndInterview
-          }
-          onBack={handleBack}
-        />
+       <InterviewChat
+  interviewType={interviewType}
+  mode={mode}
+  sessionId={sessionId}
+  onEnd={handleEndInterview}
+  onBack={handleBack}
+/>
       )}
 
       {/* STEP 4 */}
